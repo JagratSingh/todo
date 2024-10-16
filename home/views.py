@@ -1,44 +1,51 @@
 from django.shortcuts import render, redirect
-from .forms import *
-from .models import *
+from .models import *  # Import all models
 
-# Create your views here.
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .serializers import TaskSerializer
 
-def home(request):
-    tasks = ToDo.objects.all() # Fetch all task from database 
-    form = TodoForm() # Create an instance of the form
-    
-    if request.method == 'POST':
-        form = TodoForm(request.POST)
-        if form.is_valid(): # Validate the form
-            form.save() # Save the task to the database
-        return redirect('/') # Redirect to the homepage
-    
-    context = {'tasks':tasks, 'form':form}
-    
-    return render(request, 'index.html', context) # Render the template
+@api_view(['GET'])
+def apiOverview(request):
+    # Define available API endpoints
+    api_urls = {
+        'List': '/task-list/',
+        'Detail View': '/task-detail/<str:pk>/',
+        'Create': '/create-task/',
+        'Update': '/update-task/<str:pk>/',
+        'Delete': '/delete-task/<str:pk>/',
+    }
+    return Response(api_urls)
 
-def updateTask(request, pk):
-    task = ToDo.objects.get(id=pk) # Fetch the task with same id
-    form = TodoForm(instance=task) # Populate the form with the existing task
-    
-    if request.method == 'POST':
-        form = TodoForm(request.POST, instance=task)
-        if form.is_valid(): # Validate the form
-            form.save() # Save the updated task
-            return redirect('/') # After successfully saving the data it will redirect to home page
-    
-    context = {'form':form}
-    
-    return render(request, 'update_task.html', context) # Render the updated template
+@api_view(['GET'])
+def TaskList(request):
+    tasks = ToDo.objects.all()  # Fetch all tasks
+    serializer = TaskSerializer(tasks, many=True)  # Serialize task data
+    return Response(serializer.data)
 
-def deleteTask(request, pk):
-    task = ToDo.objects.get(id=pk) # Fetch the task from the database
-    
-    if request.method == 'POST':
-        task.delete() # Delete the task
-        return redirect('/') # After deleting the tas, it will redirect to the home page
-    
-    context = {'task':task}
-    
-    return render(request, 'delete_task.html', context) # Render the template
+@api_view(['GET'])
+def TaskDetail(request, pk):
+    tasks = ToDo.objects.get(id=pk)  # Fetch task by ID
+    serializer = TaskSerializer(tasks, many=False)  # Serialize task data
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def UpdateTask(request, pk):
+    task = ToDo.objects.get(id=pk)  # Fetch task to update
+    serializer = TaskSerializer(instance=task, data=request.data)  # Create serializer instance
+    if serializer.is_valid():  # Validate data
+        serializer.save()  # Save updated task
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def CreateTask(request):
+    serializer = TaskSerializer(data=request.data)  # Create serializer instance
+    if serializer.is_valid():  # Validate data
+        serializer.save()  # Save new task
+    return Response(serializer.data)
+
+@api_view(['DELETE'])
+def DeleteTask(request, pk):
+    task = ToDo.objects.get(id=pk)  # Fetch task to delete
+    task.delete()  # Delete the task
+    return Response("Task deleted successfully.")  # Return success message
