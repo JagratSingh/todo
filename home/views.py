@@ -29,7 +29,7 @@ def TaskDetail(request, pk):
     serializer = TaskSerializer(tasks, many=False)  # Serialize task data
     return Response(serializer.data)
 
-@api_view(['POST'])
+@api_view(['PUT'])
 def UpdateTask(request, pk):
     task = ToDo.objects.get(id=pk)  # Fetch task to update
     serializer = TaskSerializer(instance=task, data=request.data)  # Create serializer instance
