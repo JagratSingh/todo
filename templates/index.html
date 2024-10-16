@@ -1,0 +1,38 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+{% comment %} form for submiting the task to the database {% endcomment %}
+<form method="POST" action="/">
+    {% csrf_token %}
+    {{form.title}}
+    {{form.description}}
+    <button type="submit" class="submit_btn"> Submit </button>
+</form>
+
+{% comment %} Loop through each task and will be displayed on the screen {% endcomment %}
+<div class="todo-list">
+	{% for task in tasks %}
+		<div class="item-row">
+            {% comment %} If task is completed, a strike will appear {% endcomment %}
+			{% if task.completed == True %}
+			<h1><strike>{{task.title}}</strike></h1>
+			<p><strike>{{task.description}}</strike></p>
+
+            {% comment %} if task isn't completed {% endcomment %}
+			{% else %}
+			<h1><span>{{task.title}}</span></h1>
+			<p><span>{{task.description}}</span></p>
+			{% endif %}
+            
+            {% comment %} Buttons for deleting and updating an task {% endcomment %}
+            <div>
+                <a href="{% url 'delete_task' task.id %}">
+                    <button class="task_btn">DELETE</button>
+                </a>
+                <a href="{% url 'update_task' task.id %}">
+                    <button class="task_btn">UPDATE</button>
+                </a>
+            </div>
+		</div>
+	{% endfor %}
+</div>

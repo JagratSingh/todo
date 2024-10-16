@@ -1,0 +1,12 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+<form method="POST" action="" class="item-row">
+    {% csrf_token %}
+    <h1>{{task.title}}</h1>
+    <p>{{task.description}}</p>
+    
+    <button type="submit" class="task_btn" style="color:red; margin:10px"> Delete </button>
+</form>
+
+<a href="{% url 'home' %}"><button class="submit_btn" style="display: flex; margin: 10px auto"> Cancel </button></a>
