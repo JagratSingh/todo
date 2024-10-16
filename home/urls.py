@@ -1,8 +1,11 @@
 from django.urls import path
-from home import views
+from . import views
 
 urlpatterns = [
-    path('',views.home, name='home'),
-    path('update_task/<str:pk>/', views.updateTask, name="update_task"), 
-    path('delete_task/<str:pk>/', views.deleteTask, name="delete_task"),
+    path('', views.apiOverview, name="api-overview"),
+    path('task-list/', views.TaskList, name="task-list"),
+    path('task-detail/<str:pk>/', views.TaskDetail, name="task-Detail"),
+    path('update-task/<str:pk>/', views.UpdateTask, name="update-task"),
+    path('delete-task/<str:pk>/', views.DeleteTask, name="delete-task"),
+    path('create-task/', views.CreateTask, name="Create-task"),
 ]
